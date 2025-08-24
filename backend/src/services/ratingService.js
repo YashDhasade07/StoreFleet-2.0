@@ -120,8 +120,8 @@ class RatingService {
           model: Store,
           as: 'store',
           attributes: [
-            'id', 
-            'name', 
+            'id',
+            'name',
             'address',
             // Calculate average rating for the store
             [
@@ -318,6 +318,23 @@ class RatingService {
       }
     };
   }
+
+  // Get user's rating for a specific store
+  async getUserRatingForStore(storeId) {
+    try {
+      const response = await api.get(`/ratings/user/store/${storeId}`);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  }
+
 }
 
 export default new RatingService();

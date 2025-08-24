@@ -5,7 +5,8 @@ import {
   deleteRating,
   getMyRatings,
   getStoreRatings,
-  getAllRatings
+  getAllRatings,
+  getUserRatingForStore
 } from '../controllers/ratingController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { checkRole } from '../middleware/roleCheck.js';
@@ -20,7 +21,7 @@ router.post('/', checkRole(['normal_user']), submitRating);
 router.put('/:id', checkRole(['normal_user']), updateRating);
 router.delete('/:id', checkRole(['normal_user']), deleteRating);
 router.get('/my', checkRole(['normal_user']), getMyRatings);
-
+router.get('/user/store/:storeId', getUserRatingForStore);
 
 router.get('/store/:storeId', getStoreRatings);
 

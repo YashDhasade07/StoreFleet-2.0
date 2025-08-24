@@ -1,5 +1,5 @@
 import ratingService from '../services/ratingService.js';
-
+import { Rating, Store, User } from '../models/index.js';
 // Submit new rating (Normal users only)
 export const submitRating = async (req, res) => {
   try {
@@ -277,3 +277,49 @@ export const getAllRatings = async (req, res) => {
     });
   }
 };
+
+export const getUserRatingForStore = async (req, res) => {
+  try {
+      const userId = req.user.id;
+      const storeId = req.params.storeId;
+      console.log(0);
+      console.log('user',userId);
+      console.log('store',storeId);
+      
+      
+      const rating = await Rating.findOne({
+          where: {
+              user_id: userId,
+              store_id: storeId
+          },
+          attributes: ['id', 'rating', 'created_at', 'updated_at'], // No message
+          include: [
+              {
+                  model: Store,
+                  as: 'store',
+                  attributes: ['id', 'name', 'address']
+              }
+          ]
+      });
+console.log(1);
+
+      if (!rating) {
+          return res.status(404).json({
+              success: false,
+              message: 'Rating not found'
+          });
+      }
+
+      res.status(200).json({
+          success: true,
+          data: rating
+      });
+  } catch (error) {
+      console.error('Get user rating for store error:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Server error retrieving rating'
+      });
+  }
+};
+

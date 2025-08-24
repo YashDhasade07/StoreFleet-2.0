@@ -99,6 +99,24 @@ class RatingService {
       };
     }
   }
+
+  async getUserRatingForStore(storeId) {
+    try {
+      console.log('Getting user rating for store:', storeId);
+      const response = await api.get(`/ratings/user/store/${storeId}`);
+      
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('getUserRatingForStore error:', error);
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  }
 }
 
 export default new RatingService();

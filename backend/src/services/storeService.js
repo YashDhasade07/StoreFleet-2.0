@@ -3,71 +3,88 @@ import { Op } from 'sequelize';
 
 class StoreService {
   // Get all stores with ratings
+ 
   async getAllStores(userId, filters = {}) {
-    const {
-      sortBy = 'name',
-      sortOrder = 'ASC',
-      page = 1,
-      limit = 10
-    } = filters;
-
-    // Validate sort fields
-    const allowedSortFields = ['name', 'address', 'created_at'];
-    const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'name';
-    const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
-
-    // Calculate pagination
-    const offset = (page - 1) * limit;
-
-    const { count, rows } = await Store.findAndCountAll({
-      attributes: [
-        'id',
-        'name', 
-        'email',
-        'address',
-        'created_at',
-        // Calculate average rating
-        [
-          sequelize.literal(`(
-            SELECT COALESCE(AVG(rating::numeric), 0)::numeric(3,2)
-            FROM ratings 
-            WHERE ratings.store_id = "Store".id
-          )`),
-          'averageRating'
-        ],
-        // Get current user's rating for this store
-        [
-          sequelize.literal(`(
-            SELECT rating
-            FROM ratings 
-            WHERE ratings.store_id = "Store".id 
-            AND ratings.user_id = ${userId}
-          )`),
-          'userRating'
-        ]
-      ],
-      include: [
-        {
-          model: User,
-          as: 'owner',
-          attributes: ['id', 'name', 'email']
+    try {
+        console.log('Getting all stores for user:', userId);
+        
+        const whereCondition = {};
+        
+        // Add name filter if provided
+        if (filters.name) {
+            whereCondition.name = {
+                [Op.iLike]: `%${filters.name}%`
+            };
         }
-      ],
-      order: [[validSortBy, validSortOrder]],
-      limit: parseInt(limit),
-      offset: parseInt(offset)
-    });
 
-    return {
-      stores: rows,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
-        totalItems: count,
-        itemsPerPage: parseInt(limit)
-      }
-    };
-  }
+        const stores = await Store.findAll({
+            where: whereCondition,
+            include: [
+                {
+                    model: User,
+                    as: 'owner',
+                    attributes: ['id', 'name', 'email']
+                }
+            ],
+            order: [['created_at', 'DESC']],
+            limit: filters.limit || 50,
+            offset: ((filters.page || 1) - 1) * (filters.limit || 50)
+        });
+
+        console.log('Found stores:', stores.length);
+
+        // If userId is provided, fetch user's ratings separately
+        let processedStores = stores.map(store => store.toJSON());
+        
+        if (userId) {
+            // Get all user's ratings for these stores
+            const storeIds = processedStores.map(store => store.id);
+            const userRatings = await Rating.findAll({
+                where: {
+                    user_id: userId,
+                    store_id: storeIds
+                },
+                attributes: ['id', 'rating', 'store_id', 'created_at', 'updated_at']
+            });
+
+            // Create a map of store_id -> rating for quick lookup
+            const ratingsMap = {};
+            userRatings.forEach(rating => {
+                ratingsMap[rating.store_id] = rating;
+            });
+
+            // Add user rating info to stores
+            processedStores = processedStores.map(store => {
+                const userRating = ratingsMap[store.id];
+                if (userRating) {
+                    store.userRating = userRating.rating;
+                    store.userRatingId = userRating.id;
+                    store.userRatingDate = userRating.created_at;
+                }
+                return store;
+            });
+        }
+
+        // Get total count for pagination
+        const totalCount = await Store.count({ where: whereCondition });
+
+        return {
+            stores: processedStores,
+            pagination: {
+                totalItems: totalCount,
+                totalPages: Math.ceil(totalCount / (filters.limit || 50)),
+                currentPage: filters.page || 1,
+                itemsPerPage: filters.limit || 50
+            }
+        };
+    } catch (error) {
+        console.error('StoreService getAllStores error:', error);
+        throw error;
+    }
+}
+
+
+
 
   // Search stores by name and address
   async searchStores(userId, searchFilters = {}) {

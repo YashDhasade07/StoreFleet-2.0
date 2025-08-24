@@ -7,30 +7,35 @@ import {
 // Get all stores
 export const getAllStores = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const filters = {
-      sortBy: req.query.sortBy || 'name',
-      sortOrder: req.query.sortOrder || 'ASC',
-      page: req.query.page || 1,
-      limit: req.query.limit || 10
-    };
+      console.log('Getting all stores...');
+      console.log('User from token:', req.user);
+      
+      const userId = req.user?.id; // Get user ID from JWT token
+      const filters = {
+          name: req.query.name,
+          page: parseInt(req.query.page) || 1,
+          limit: parseInt(req.query.limit) || 12
+      };
 
-    const result = await storeService.getAllStores(userId, filters);
-
-    res.status(200).json({
-      success: true,
-      message: 'Stores retrieved successfully',
-      data: result
-    });
+      const result = await storeService.getAllStores(userId, filters);
+      
+      console.log('Stores fetched successfully:', result.stores.length);
+      
+      res.status(200).json({
+          success: true,
+          message: 'Stores retrieved successfully',
+          data: result
+      });
 
   } catch (error) {
-    console.error('Get all stores error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error retrieving stores'
-    });
+      console.error('Get all stores error:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Server error retrieving stores'
+      });
   }
 };
+
 
 // Search stores by name and address
 export const searchStores = async (req, res) => {

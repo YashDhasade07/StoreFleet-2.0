@@ -8,6 +8,8 @@ const StoreCard = ({
   allowRating = false, 
   onEdit, 
   onDelete, 
+  onRate,        // Add this prop
+  onUpdateRating, // Add this prop
   onClick 
 }) => {
   const getRatingColor = (rating) => {
@@ -17,6 +19,27 @@ const StoreCard = ({
 
   const formatRating = (rating) => {
     return parseFloat(rating || 0).toFixed(1);
+  };
+
+  // Add these handler functions
+  const handleRateStore = (e) => {
+    e.stopPropagation(); // Prevent card click
+    console.log('Rate Store clicked for store:', store.id); // Debug log
+    if (onRate) {
+      onRate(store);
+    } else {
+      console.error('onRate handler not provided');
+    }
+  };
+
+  const handleUpdateRating = (e) => {
+    e.stopPropagation(); // Prevent card click
+    console.log('Update Rating clicked for store:', store.id); // Debug log
+    if (onUpdateRating) {
+      onUpdateRating(store);
+    } else {
+      console.error('onUpdateRating handler not provided');
+    }
   };
 
   return (
@@ -96,11 +119,15 @@ const StoreCard = ({
       {/* Actions */}
       {(showActions || allowRating) && (
         <div className="store-card-actions" onClick={(e) => e.stopPropagation()}>
+          {/* Admin Actions */}
           {showActions && (
             <>
               <button 
                 className="btn btn-secondary btn-small"
-                onClick={() => onEdit(store)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(store);
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
@@ -109,7 +136,10 @@ const StoreCard = ({
               </button>
               <button 
                 className="btn btn-red btn-small"
-                onClick={() => onDelete(store.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(store.id);
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -119,13 +149,31 @@ const StoreCard = ({
             </>
           )}
           
+          {/* User Rating Actions */}
           {allowRating && (
-            <button className="btn btn-primary btn-small">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-              </svg>
-              {store.userRating ? 'Update Rating' : 'Rate Store'}
-            </button>
+            <>
+              {store.userRating ? (
+                <button 
+                  className="btn btn-primary btn-small"
+                  onClick={handleUpdateRating}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                  Update Rating
+                </button>
+              ) : (
+                <button 
+                  className="btn btn-primary btn-small"
+                  onClick={handleRateStore}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                  </svg>
+                  Rate Store
+                </button>
+              )}
+            </>
           )}
         </div>
       )}

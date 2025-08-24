@@ -49,10 +49,12 @@ export const API_CONFIG = {
     // Ratings
     RATINGS: {
       SUBMIT: '/ratings',
+      CREATE: '/ratings',
       UPDATE: (id) => `/ratings/${id}`,
       DELETE: (id) => `/ratings/${id}`,
       MY_RATINGS: '/ratings/my',
       STORE_RATINGS: (storeId) => `/ratings/store/${storeId}`,
+      SER_STORE_RATING: (storeId) => `/ratings/user/store/${storeId}`, // ,
       ALL: '/ratings'
     },
     
