@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Gmail-inspired color palette */
+  --color-primary-blue: #1a73e8;
+  --color-primary-blue-hover: #1557b0;
+  --color-red: #ea4335;
+  --color-red-light: #fce8e6;
+  --color-yellow: #fbbc04;
+  --color-yellow-light: #fef7e0;
+  --color-green: #34a853;
+  --color-green-light: #e6f4ea;
+  --color-orange: #ff6d01;
+  --color-orange-light: #fff4e5;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e8eaed;
+  --color-gray-300: #dadce0;
+  --color-gray-400: #9aa0a6;
+  --color-gray-500: #5f6368;
+  --color-gray-600: #3c4043;
+  --color-gray-700: #202124;
+  --color-white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-white);
+  color: var(--color-gray-700);
+  line-height: 1.5;
+}
+
+/* Gmail-inspired utility classes */
+.bg-primary { background-color: var(--color-primary-blue); }
+.bg-red { background-color: var(--color-red); }
+.bg-red-light { background-color: var(--color-red-light); }
+.bg-yellow { background-color: var(--color-yellow); }
+.bg-yellow-light { background-color: var(--color-yellow-light); }
+.bg-green { background-color: var(--color-green); }
+.bg-green-light { background-color: var(--color-green-light); }
+.bg-orange { background-color: var(--color-orange); }
+.bg-orange-light { background-color: var(--color-orange-light); }
+
+.text-primary { color: var(--color-primary-blue); }
+.text-red { color: var(--color-red); }
+.text-green { color: var(--color-green); }
+.text-yellow { color: var(--color-yellow); }
+.text-orange { color: var(--color-orange); }
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background-color: var(--color-primary-blue);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-blue-hover);
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--color-white);
+  color: var(--color-primary-blue);
+  border: 1px solid var(--color-gray-300);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-gray-50);
+}
+
+.card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.input {
+  padding: 12px 16px;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* Add spinning animation for loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Notification styles */
+.notification {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-success {
+  background-color: var(--color-green-light);
+  color: var(--color-green);
+  border-left: 4px solid var(--color-green);
+}
+
+.notification-error {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+  border-left: 4px solid var(--color-red);
+}
+
+.notification-warning {
+  background-color: var(--color-yellow-light);
+  color: var(--color-yellow);
+  border-left: 4px solid var(--color-yellow);
+}
+
+.notification-info {
+  background-color: var(--color-gray-100);
+  color: var(--color-primary-blue);
+  border-left: 4px solid var(--color-primary-blue);
+}

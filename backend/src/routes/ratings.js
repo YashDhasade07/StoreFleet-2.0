@@ -21,7 +21,7 @@ router.put('/:id', checkRole(['normal_user']), updateRating);
 router.delete('/:id', checkRole(['normal_user']), deleteRating);
 router.get('/my', checkRole(['normal_user']), getMyRatings);
 
-// Routes for store owners and admins
+
 router.get('/store/:storeId', getStoreRatings);
 
 // Admin only routes

@@ -1,0 +1,46 @@
+/* Register-specific styles (extends Login.css) */
+@import '../Login/Login.css';
+
+.form-required {
+  color: var(--color-red);
+  font-weight: 500;
+}
+
+.form-optional {
+  color: var(--color-gray-400);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--color-gray-500);
+  margin-top: 4px;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* Adjusted spacing for register form */
+.auth-card {
+  max-width: 480px;
+}
+
+.form-group {
+  gap: 8px;
+}
+
+/* Character counter for name field */
+.form-group:has(#name) .form-hint::after {
+  content: " (" attr(data-count, "0") "/60)";
+  color: var(--color-gray-400);
+}
