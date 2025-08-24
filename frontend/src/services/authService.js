@@ -5,25 +5,34 @@ class AuthService {
   // Login user
   async login(credentials) {
     try {
-      const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
+      console.log('AuthService login called with:', credentials);
       
-      if (response.success && response.data) {
+      // Make the API call
+      const apiResponse = await api.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
+      console.log('AuthService API response:', apiResponse);
+      
+      // Check if login was successful
+      if (apiResponse.success && apiResponse.data) {
         // Store token and user data
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('authToken', apiResponse.data.token);
+        localStorage.setItem('user', JSON.stringify(apiResponse.data.user));
+        
+        console.log('Login successful - token and user stored');
         
         return {
           success: true,
-          data: response.data,
-          message: response.message
+          data: apiResponse.data,
+          message: apiResponse.message || 'Login successful'
         };
       }
       
+      // Login failed
       return {
         success: false,
-        message: response.message || 'Login failed'
+        message: apiResponse.message || 'Login failed'
       };
     } catch (error) {
+      console.error('AuthService login error:', error);
       return {
         success: false,
         message: error.message || 'Login failed'
@@ -34,23 +43,23 @@ class AuthService {
   // Register user
   async register(userData) {
     try {
-      const response = await api.post(API_ENDPOINTS.AUTH.REGISTER, userData);
+      const apiResponse = await api.post(API_ENDPOINTS.AUTH.REGISTER, userData);
       
-      if (response.success && response.data) {
+      if (apiResponse.success && apiResponse.data) {
         // Store token and user data
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('authToken', apiResponse.data.token);
+        localStorage.setItem('user', JSON.stringify(apiResponse.data.user));
         
         return {
           success: true,
-          data: response.data,
-          message: response.message
+          data: apiResponse.data,
+          message: apiResponse.message || 'Registration successful'
         };
       }
       
       return {
         success: false,
-        message: response.message || 'Registration failed'
+        message: apiResponse.message || 'Registration failed'
       };
     } catch (error) {
       return {
@@ -76,21 +85,21 @@ class AuthService {
   // Get current user
   async getCurrentUser() {
     try {
-      const response = await api.get(API_ENDPOINTS.AUTH.ME);
+      const apiResponse = await api.get(API_ENDPOINTS.AUTH.ME);
       
-      if (response.success && response.data) {
+      if (apiResponse.success && apiResponse.data) {
         // Update stored user data
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('user', JSON.stringify(apiResponse.data.user));
         
         return {
           success: true,
-          data: response.data.user
+          data: apiResponse.data.user
         };
       }
       
       return {
         success: false,
-        message: response.message || 'Failed to get user data'
+        message: apiResponse.message || 'Failed to get user data'
       };
     } catch (error) {
       return {

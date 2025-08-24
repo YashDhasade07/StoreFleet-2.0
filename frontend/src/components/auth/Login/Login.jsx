@@ -19,20 +19,23 @@ const Login = ({ onSwitchToRegister }) => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    
+    console.log('Login form submitted:', data); // Debug log
     try {
       const result = await login({
         email: data.email,
         password: data.password
       });
-
+      console.log('Login component result:', result); // Debug log
       if (result.success) {
         showSuccess('Login successful! Welcome back.');
+        console.log('Login success - should redirect now'); // Debug log
         reset();
       } else {
         showError(result.message || 'Login failed. Please try again.');
+        console.log('Login failed:', result.message); // Debug log
       }
     } catch (error) {
+      console.error('Login component error:', error); // Debug log
       showError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);

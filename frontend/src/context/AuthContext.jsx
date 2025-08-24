@@ -47,14 +47,19 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const result = await authService.login(credentials);
+      console.log('AuthContext login result:', result); // Debug log
+      
       if (result.success) {
+        console.log('Setting user:', result.data.user); // Debug log
         setUser(result.data.user);
         return { success: true, message: result.message };
       } else {
+        console.log('Login failed:', result.message); // Debug log
         setUser(null);
         return { success: false, message: result.message };
       }
     } catch (error) {
+      console.error('AuthContext login error:', error); // Debug log
       setUser(null);
       return { success: false, message: error.message || 'Login failed' };
     } finally {

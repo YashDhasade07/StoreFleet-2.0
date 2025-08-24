@@ -95,7 +95,8 @@ export const login = async (req, res) => {
 
         // Call service
         const result = await authService.loginUser(email, password);
-
+        console.log('login done');
+        
         res.status(200).json({
             success: true,
             message: 'Login successful',

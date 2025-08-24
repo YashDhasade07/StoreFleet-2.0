@@ -1,0 +1,194 @@
+.user-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .user-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .user-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    background-color: var(--color-primary-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  
+  .user-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .user-name {
+    color: var(--color-gray-700);
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .user-email {
+    color: var(--color-gray-500);
+    font-size: 14px;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .role-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  
+  .user-card-body {
+    margin-bottom: 16px;
+  }
+  
+  .user-address {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    color: var(--color-gray-600);
+    font-size: 13px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  
+  .user-address svg {
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  
+  .user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .created-date,
+  .user-ratings {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-gray-500);
+    font-size: 13px;
+  }
+  
+  .owned-stores {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-gray-200);
+  }
+  
+  .stores-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-gray-600);
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .stores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .store-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background-color: var(--color-gray-50);
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  .store-name {
+    color: var(--color-gray-700);
+    font-weight: 500;
+  }
+  
+  .store-rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--color-yellow);
+    font-weight: 500;
+  }
+  
+  .no-stores {
+    font-size: 12px;
+    color: var(--color-gray-400);
+    font-style: italic;
+  }
+  
+  .user-card-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-gray-200);
+  }
+  
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .btn-red {
+    background-color: var(--color-red);
+    color: white;
+    border: none;
+  }
+  
+  .btn-red:hover {
+    background-color: #d32f2f;
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 480px) {
+    .user-card-header {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .user-info {
+      text-align: center;
+    }
+  
+    .role-badge {
+      align-self: center;
+    }
+  
+    .user-card-actions {
+      flex-direction: column;
+    }
+  }
+  

@@ -1,0 +1,40 @@
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .stars-container {
+    display: flex;
+    gap: 2px;
+  }
+  
+  .star {
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .star-active {
+    color: var(--color-yellow);
+  }
+  
+  .star-inactive {
+    color: var(--color-gray-300);
+  }
+  
+  .star-interactive:hover {
+    transform: scale(1.1);
+  }
+  
+  .star-readonly {
+    cursor: default;
+  }
+  
+  .rating-value {
+    font-size: 14px;
+    color: var(--color-gray-600);
+    font-weight: 500;
+  }
+  

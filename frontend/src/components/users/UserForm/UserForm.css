@@ -1,0 +1,138 @@
+.user-form {
+    padding: 32px;
+  }
+  
+  .user-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+  
+  .user-form-header h2 {
+    color: var(--color-gray-700);
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--color-gray-500);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  
+  .close-btn:hover {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-700);
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+  
+  .form-required {
+    color: var(--color-red);
+    font-weight: 500;
+  }
+  
+  .form-optional {
+    color: var(--color-gray-400);
+    font-weight: 400;
+    font-size: 12px;
+  }
+  
+  .form-input {
+    padding: 12px 16px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: var(--color-primary-blue);
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  }
+  
+  .form-input-error {
+    border-color: var(--color-red);
+  }
+  
+  .form-input-error:focus {
+    border-color: var(--color-red);
+    box-shadow: 0 0 0 2px rgba(234, 67, 53, 0.2);
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+  }
+  
+  .form-error {
+    color: var(--color-red);
+    font-size: 12px;
+  }
+  
+  .form-hint {
+    font-size: 12px;
+    color: var(--color-gray-500);
+  }
+  
+  .role-description {
+    padding: 8px 12px;
+    background-color: var(--color-gray-50);
+    border-radius: 4px;
+    border-left: 3px solid var(--color-primary-blue);
+  }
+  
+  .role-description p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-gray-600);
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-gray-200);
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 480px) {
+    .user-form {
+      padding: 24px 16px;
+    }
+  
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+  
+    .form-actions .btn {
+      width: 100%;
+    }
+  }
+  
