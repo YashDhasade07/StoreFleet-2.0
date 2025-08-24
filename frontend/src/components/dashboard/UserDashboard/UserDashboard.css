@@ -1,0 +1,42 @@
+/* User Dashboard specific styles */
+.user-dashboard {
+    /* Add specific user dashboard styles if needed */
+  }
+  
+  .activity-card {
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+  }
+  
+  .activity-card:hover {
+    border-left-color: var(--color-primary-blue);
+    background-color: var(--color-gray-50);
+  }
+  
+  .discover-section {
+    background: linear-gradient(135deg, var(--color-primary-blue) 0%, #1557b0 100%);
+    color: white;
+  }
+  
+  .tip-section {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .tip-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+  }
+  
+  @media (max-width: 768px) {
+    .user-dashboard .grid-2fr-1fr {
+      grid-template-columns: 1fr;
+    }
+  }
+  

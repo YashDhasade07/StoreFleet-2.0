@@ -1,0 +1,25 @@
+/* Owner Dashboard specific styles */
+.owner-dashboard {
+    /* Add specific owner dashboard styles if needed */
+  }
+  
+  .performance-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .performance-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .store-info-placeholder {
+    border: 2px dashed var(--color-gray-300);
+    background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-gray-100) 100%);
+  }
+  
+  @media (max-width: 768px) {
+    .owner-dashboard .card {
+      grid-column: 1 / -1;
+    }
+  }
+  
