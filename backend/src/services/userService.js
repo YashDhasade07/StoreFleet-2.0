@@ -200,6 +200,82 @@ class UserService {
     await user.update({ password: hashedNewPassword });
     return true;
   }
+
+
+  async getUserStats(userId) {
+    try {
+        // Get user's rating statistics
+        const userRatings = await Rating.findAll({
+            where: { user_id: userId },
+            include: [
+                {
+                    model: Store,
+                    as: 'store',
+                    attributes: ['id', 'name']
+                }
+            ],
+            order: [['created_at', 'DESC']]
+        });
+
+        // Calculate user statistics
+        const totalRatings = userRatings.length;
+        const totalStoresRated = new Set(userRatings.map(r => r.store_id)).size;
+        const ratingsWithMessage = userRatings.filter(r => r.message && r.message.trim()).length;
+
+        // Calculate average rating given by user
+        const averageRatingGiven = totalRatings > 0 
+            ? (userRatings.reduce((sum, r) => sum + r.rating, 0) / totalRatings).toFixed(1)
+            : '0.0';
+
+        // Get recent activity (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const recentRatings = await Rating.count({
+            where: {
+                user_id: userId,
+                created_at: {
+                    [Op.gte]: thirtyDaysAgo
+                }
+            }
+        });
+
+        // Get favorite stores (5-star ratings)
+        const favoriteStores = await Rating.findAll({
+            where: {
+                user_id: userId,
+                rating: 5
+            },
+            include: [
+                {
+                    model: Store,
+                    as: 'store',
+                    attributes: ['id', 'name', 'address']
+                }
+            ],
+            limit: 5,
+            order: [['created_at', 'DESC']]
+        });
+
+        // Get latest ratings
+        const latestRatings = userRatings.slice(0, 5);
+
+        return {
+            totalRatings,
+            totalStoresRated,
+            ratingsWithMessage,
+            averageRatingGiven,
+            recentActivity: {
+                ratingsThisMonth: recentRatings
+            },
+            favoriteStores: favoriteStores.map(r => r.store),
+            latestRatings
+        };
+    } catch (error) {
+        console.error('UserService getUserStats error:', error);
+        throw error;
+    }
+}
 }
 
 export default new UserService();

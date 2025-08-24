@@ -356,3 +356,26 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
+
+
+export const getUserStats = async (req, res) => {
+  try {
+      const userId = req.user.id; // From JWT token
+      console.log('Getting user stats for user:', userId);
+      
+      const result = await userService.getUserStats(userId);
+      
+      res.status(200).json({
+          success: true,
+          message: 'User stats retrieved successfully',
+          data: result
+      });
+
+  } catch (error) {
+      console.error('Get user stats error:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Server error retrieving user stats'
+      });
+  }
+};

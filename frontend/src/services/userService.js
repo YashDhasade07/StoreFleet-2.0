@@ -3,6 +3,25 @@ import { API_ENDPOINTS } from '../utils/constants.js';
 
 class UserService {
   // Get user profile
+  async getUserStats() {
+    try {
+      console.log('UserService: Calling getUserStats API...');
+      const response = await api.get('/users/stats');
+      console.log('UserService: getUserStats response:', response);
+      
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('UserService: getUserStats error:', error);
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  }
+  
   async getProfile() {
     try {
       const response = await api.get(API_ENDPOINTS.USERS.PROFILE);

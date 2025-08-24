@@ -6,7 +6,8 @@ import {
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getUserStats
 } from '../controllers/userController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { checkRole } from '../middleware/roleCheck.js';
@@ -19,7 +20,7 @@ router.use(authenticateToken);
 // Routes for all authenticated users
 router.get('/profile', getUserProfile);
 router.put('/password', updatePassword);
-
+router.get('/stats', getUserStats);
 // Admin only routes
 router.get('/', checkRole(['system_admin']), getAllUsers);
 router.get('/:id', checkRole(['system_admin']), getUserById);

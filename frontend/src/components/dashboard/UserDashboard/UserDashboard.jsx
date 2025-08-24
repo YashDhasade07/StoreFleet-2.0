@@ -1,8 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth.js';
+import { useApp } from '../../../context/AppContext.jsx';
+import userService from '../../../services/userService.js';
 
 const UserDashboard = () => {
   const { user } = useAuth();
+  const { showError } = useApp();
+  const navigate = useNavigate();
+  
+  const [stats, setStats] = useState({
+    totalRatings: 0,
+    totalStoresRated: 0,
+    ratingsWithMessage: 0,
+    averageRatingGiven: '0.0',
+    recentActivity: {
+      ratingsThisMonth: 0
+    },
+    favoriteStores: [],
+    latestRatings: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserStats();
+  }, []);
+
+  const fetchUserStats = async () => {
+    setLoading(true);
+    try {
+      console.log('Fetching user stats...');
+      const result = await userService.getUserStats();
+      
+      if (result.success) {
+        console.log('User stats received:', result.data);
+        setStats(result.data);
+      } else {
+        console.error('Failed to fetch user stats:', result.message);
+        showError(result.message || 'Failed to load your statistics');
+      }
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+      showError('Error loading your dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearchStores = () => {
+    navigate('/stores');
+  };
+
+  const handleViewMyRatings = () => {
+    navigate('/my-ratings');
+  };
+
+  const handleViewTopStores = () => {
+    navigate('/stores?filter=top-rated');
+  };
+
+  const handleEditProfile = () => {
+    navigate('/profile');
+  };
 
   return (
     <div>
@@ -16,7 +75,7 @@ const UserDashboard = () => {
           User Dashboard
         </h1>
         <p style={{ color: 'var(--color-gray-600)', fontSize: '16px' }}>
-          Welcome back, {user?.name}! Discover and rate amazing stores in your area.
+          Welcome back, {user?.name}! Here's your activity overview.
         </p>
       </div>
 
@@ -45,16 +104,16 @@ const UserDashboard = () => {
               </svg>
             </div>
             <div>
-              <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '4px' }}>
+              <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '4px', fontSize: '14px' }}>
                 My Ratings
               </h3>
-              <p style={{ fontSize: '28px', fontWeight: '600', color: 'var(--color-primary-blue)' }}>
-                0
+              <p style={{ fontSize: '28px', fontWeight: '600', color: 'var(--color-primary-blue)', margin: 0 }}>
+                {loading ? '...' : stats.totalRatings}
               </p>
             </div>
           </div>
-          <p style={{ fontSize: '14px', color: 'var(--color-gray-500)' }}>
-            Total stores you've rated
+          <p style={{ fontSize: '14px', color: 'var(--color-gray-500)', margin: 0 }}>
+            Total stores you've rated (avg: {loading ? '...' : stats.averageRatingGiven}/5)
           </p>
         </div>
 
@@ -75,16 +134,16 @@ const UserDashboard = () => {
               </svg>
             </div>
             <div>
-              <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '4px' }}>
-                Favorite Stores
+              <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '4px', fontSize: '14px' }}>
+                Stores Visited
               </h3>
-              <p style={{ fontSize: '28px', fontWeight: '600', color: 'var(--color-green)' }}>
-                0
+              <p style={{ fontSize: '28px', fontWeight: '600', color: 'var(--color-green)', margin: 0 }}>
+                {loading ? '...' : stats.totalStoresRated}
               </p>
             </div>
           </div>
-          <p style={{ fontSize: '14px', color: 'var(--color-gray-500)' }}>
-            5-star rated stores
+          <p style={{ fontSize: '14px', color: 'var(--color-gray-500)', margin: 0 }}>
+            Different stores you've experienced
           </p>
         </div>
 
@@ -105,19 +164,48 @@ const UserDashboard = () => {
               </svg>
             </div>
             <div>
-              <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '4px' }}>
+              <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '4px', fontSize: '14px' }}>
                 This Month
               </h3>
-              <p style={{ fontSize: '28px', fontWeight: '600', color: 'var(--color-orange)' }}>
-                0
+              <p style={{ fontSize: '28px', fontWeight: '600', color: 'var(--color-orange)', margin: 0 }}>
+                {loading ? '...' : stats.recentActivity.ratingsThisMonth}
               </p>
             </div>
           </div>
-          <p style={{ fontSize: '14px', color: 'var(--color-gray-500)' }}>
+          <p style={{ fontSize: '14px', color: 'var(--color-gray-500)', margin: 0 }}>
             New ratings submitted
           </p>
         </div>
       </div>
+
+      {/* Favorite Stores */}
+      {!loading && stats.favoriteStores.length > 0 && (
+        <div className="card" style={{ padding: '24px', marginBottom: '32px' }}>
+          <h3 style={{ color: 'var(--color-gray-700)', marginBottom: '16px' }}>
+            Your Favorite Stores (5 ⭐)
+          </h3>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            {stats.favoriteStores.map((store, index) => (
+              <div key={index} style={{
+                padding: '12px 16px',
+                backgroundColor: 'var(--color-green-light)',
+                borderRadius: '8px',
+                border: '1px solid var(--color-green)',
+                cursor: 'pointer'
+              }}
+              onClick={() => navigate(`/stores/${store.id}`)}
+              >
+                <h4 style={{ margin: '0 0 4px 0', color: 'var(--color-green)', fontSize: '14px' }}>
+                  {store.name}
+                </h4>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-gray-600)' }}>
+                  {store.address}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Main Content Grid */}
       <div style={{ 
@@ -137,7 +225,7 @@ const UserDashboard = () => {
             <h3 style={{ color: 'var(--color-gray-700)' }}>
               Discover New Stores
             </h3>
-            <button className="btn btn-primary">
+            <button className="btn btn-primary" onClick={handleSearchStores}>
               Browse All Stores
             </button>
           </div>
@@ -157,7 +245,7 @@ const UserDashboard = () => {
             <p style={{ color: 'var(--color-gray-500)', fontSize: '14px', marginBottom: '16px' }}>
               Find amazing local stores and share your experience with others.
             </p>
-            <button className="btn btn-primary">
+            <button className="btn btn-primary" onClick={handleSearchStores}>
               Start Exploring
             </button>
           </div>
@@ -169,28 +257,28 @@ const UserDashboard = () => {
             Quick Actions
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <button className="btn btn-primary" style={{ justifyContent: 'flex-start' }}>
+            <button className="btn btn-primary" style={{ justifyContent: 'flex-start' }} onClick={handleSearchStores}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
                 <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
               </svg>
               Search Stores
             </button>
             
-            <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
+            <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={handleViewMyRatings}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
               </svg>
               My Reviews
             </button>
             
-            <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
+            <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={handleViewTopStores}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
               Top Rated Stores
             </button>
             
-            <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
+            <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={handleEditProfile}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -211,30 +299,63 @@ const UserDashboard = () => {
           <h3 style={{ color: 'var(--color-gray-700)' }}>
             Recent Activity
           </h3>
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={handleViewMyRatings}>
             View All Activity
           </button>
         </div>
         
-        <div style={{ 
-          backgroundColor: 'var(--color-gray-50)',
-          padding: '48px 24px',
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--color-gray-400)" style={{ marginBottom: '16px' }}>
-            <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.95,2.55 2,6.82 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.05,17.91L17.45,16.38C16.17,18 14.21,19 12,19Z"/>
-          </svg>
-          <h4 style={{ color: 'var(--color-gray-600)', marginBottom: '8px' }}>
-            No recent activity
-          </h4>
-          <p style={{ color: 'var(--color-gray-500)', fontSize: '14px' }}>
-            Start rating stores to see your activity here.
-          </p>
-        </div>
+        {!loading && stats.latestRatings.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {stats.latestRatings.slice(0, 3).map((rating, index) => (
+              <div key={index} style={{
+                padding: '16px',
+                backgroundColor: 'var(--color-gray-50)',
+                borderRadius: '8px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', color: 'var(--color-gray-700)', fontSize: '14px' }}>
+                    {rating.store?.name || 'Store'}
+                  </h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', gap: '2px' }}>
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < rating.rating ? 'var(--color-yellow)' : 'var(--color-gray-300)'}>
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                      ))}
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--color-gray-500)' }}>
+                      {new Date(rating.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ 
+            backgroundColor: 'var(--color-gray-50)',
+            padding: '48px 24px',
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--color-gray-400)" style={{ marginBottom: '16px' }}>
+              <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.95,2.55 2,6.82 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.05,17.91L17.45,16.38C16.17,18 14.21,19 12,19Z"/>
+            </svg>
+            <h4 style={{ color: 'var(--color-gray-600)', marginBottom: '8px' }}>
+              No recent activity
+            </h4>
+            <p style={{ color: 'var(--color-gray-500)', fontSize: '14px' }}>
+              Start rating stores to see your activity here.
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Tips Section */}
+      {/* Pro Tip Section */}
       <div className="card" style={{ 
         padding: '24px', 
         backgroundColor: 'var(--color-primary-blue)', 
@@ -263,6 +384,35 @@ const UserDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '4px solid var(--color-gray-200)',
+              borderTop: '4px solid var(--color-primary-blue)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 16px'
+            }}></div>
+            <p style={{ color: 'var(--color-gray-600)' }}>Loading your dashboard...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
