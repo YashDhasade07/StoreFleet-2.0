@@ -12,7 +12,7 @@ const router = express.Router();
 
 // All admin routes require system admin role
 router.use(authenticateToken, checkRole(['system_admin']));
-
+ 
 // Dashboard and statistics
 router.get('/dashboard', getDashboardStats);
 router.get('/users', getAllUsersAdmin);

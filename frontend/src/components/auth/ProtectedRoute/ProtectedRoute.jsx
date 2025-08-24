@@ -3,54 +3,48 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth.js';
 
 const ProtectedRoute = ({ children, allowedRoles = [], redirectPath = "/login" }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, isLoggedIn } = useAuth();
   const location = useLocation();
 
-  // Show loading while checking authentication
+  // Add debug logs
+  console.log('ProtectedRoute Debug:');
+  console.log('- User:', user);
+  console.log('- User role:', user?.role);
+  console.log('- Allowed roles:', allowedRoles);
+  console.log('- Is logged in:', isLoggedIn());
+  console.log('- Loading:', loading);
+
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: 'var(--color-gray-50)'
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
       }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '16px'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid var(--color-gray-200)',
-            borderTop: '4px solid var(--color-primary-blue)',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-          <p style={{ color: 'var(--color-gray-600)', fontSize: '14px' }}>
-            Loading...
-          </p>
-        </div>
+        <div>Loading...</div>
       </div>
     );
   }
 
   // Check if user is authenticated
-  if (!user) {
-    // Redirect to login with return URL
+  if (!isLoggedIn() || !user) {
+    console.log('User not authenticated, redirecting to:', redirectPath);
     return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
 
   // Check if user has required role
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    // Redirect to unauthorized page
-    return <Navigate to="/unauthorized" replace />;
+  if (allowedRoles.length > 0) {
+    const hasPermission = allowedRoles.includes(user.role);
+    console.log('Permission check:', hasPermission);
+    
+    if (!hasPermission) {
+      console.log('Access denied. User role:', user.role, 'Required:', allowedRoles);
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
-  // User is authenticated and authorized
+  console.log('Access granted for role:', user.role);
   return children;
 };
 
