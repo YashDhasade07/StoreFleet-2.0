@@ -6,23 +6,27 @@ import {
   updateStore,
   deleteStore,
   searchStores,
-  getMyStore
+  getMyStore,
+  getMyStores
 } from '../controllers/storeController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { checkRole } from '../middleware/roleCheck.js';
 
-const router = express.Router();
+const router = express.Router(); 
 
-// All routes require authentication
+// All routes require authentication 
 router.use(authenticateToken);
 
 // Routes for all authenticated users
 router.get('/', getAllStores);
 router.get('/search', searchStores);
+router.get('/mystores',checkRole(['store_owner']), getMyStores);
+router.get('/my/store', checkRole(['store_owner']), getMyStore);
 router.get('/:id', getStoreById);
 
 // Store owner routes
-router.get('/my/store', checkRole(['store_owner']), getMyStore);
+// Add this route for store owners
+
 
 // Admin only routes
 router.post('/', checkRole(['system_admin']), createStore);

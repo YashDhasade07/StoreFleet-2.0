@@ -277,6 +277,7 @@ export const updateStore = async (req, res) => {
   }
 };
 
+
 // Delete store (Admin only)
 export const deleteStore = async (req, res) => {
   try {
@@ -311,5 +312,39 @@ export const deleteStore = async (req, res) => {
       success: false,
       message: 'Server error during store deletion'
     });
+  }
+};
+
+
+// Add this method for store owners
+export const getMyStores = async (req, res) => {
+  try {
+    console.log('hii');
+      const ownerId = req.user.id; // From JWT token
+      console.log('Getting stores for owner ID:', ownerId);
+      console.log('User role:', req.user.role);
+      
+      if (!ownerId) {
+          return res.status(400).json({
+              success: false,
+              message: 'User ID not found in token'
+          });
+      }
+
+      const result = await storeService.getStoresByOwner(ownerId);
+      console.log('Stores found:', result.stores.length);
+      
+      res.status(200).json({
+          success: true,
+          message: 'Owner stores retrieved successfully',
+          data: result
+      });
+
+  } catch (error) {
+      console.error('Get my stores error:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Server error retrieving your stores'
+      });
   }
 };

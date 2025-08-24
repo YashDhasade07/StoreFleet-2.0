@@ -367,6 +367,71 @@ class StoreService {
     await store.destroy();
     return true;
   }
+
+  // Add this method to get stores by owner ID
+  async getStoresByOwner(ownerId) {
+    try {
+        console.log('StoreService: Getting stores for owner:', ownerId);
+        
+        const stores = await Store.findAll({
+            where: {
+                owner_id: ownerId
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'owner',
+                    attributes: ['id', 'name', 'email']
+                }
+            ],
+            order: [['created_at', 'DESC']]
+        });
+
+        console.log('StoreService: Found stores:', stores.length);
+
+        // Get ratings count and average for each store
+        const storesWithStats = await Promise.all(
+            stores.map(async (store) => {
+                const storeData = store.toJSON();
+                
+                try {
+                    // Get rating statistics
+                    const ratingStats = await Rating.findAll({
+                        where: { store_id: store.id },
+                        attributes: [
+                            [sequelize.fn('COUNT', sequelize.col('id')), 'totalRatings'],
+                            [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating']
+                        ],
+                        raw: true
+                    });
+
+                    if (ratingStats && ratingStats[0]) {
+                        storeData.totalRatings = parseInt(ratingStats[0].totalRatings) || 0;
+                        storeData.averageRating = parseFloat(ratingStats[0].averageRating) || 0;
+                    } else {
+                        storeData.totalRatings = 0;
+                        storeData.averageRating = 0;
+                    }
+                } catch (statsError) {
+                    console.log('Error getting stats for store', store.id, ':', statsError.message);
+                    storeData.totalRatings = 0;
+                    storeData.averageRating = 0;
+                }
+
+                return storeData;
+            })
+        );
+
+        return {
+            stores: storesWithStats,
+            totalStores: stores.length
+        };
+    } catch (error) {
+        console.error('StoreService getStoresByOwner error:', error);
+        throw error;
+    }
+}
+
 }
 
 export default new StoreService();
