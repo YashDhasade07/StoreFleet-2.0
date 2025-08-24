@@ -8,12 +8,12 @@ class AdminService {
             // Get total counts
             const [totalUsers, totalStores, totalRatings] = await Promise.all([
                 User.count(),
-                Store.count(),
+                Store.count(), 
                 Rating.count()
             ]);
 
-            // Get user role distribution
-            const userRoleStats = await User.findAll({
+            // Get role distribution
+            const roleStats = await User.findAll({
                 attributes: [
                     'role',
                     [sequelize.fn('COUNT', sequelize.col('role')), 'count']
@@ -21,108 +21,59 @@ class AdminService {
                 group: ['role']
             });
 
-            // Get recent activity (last 7 days)
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            // Get recent activity (last 30 days)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
             const [recentUsers, recentStores, recentRatings] = await Promise.all([
                 User.count({
                     where: {
                         created_at: {
-                            [Op.gte]: sevenDaysAgo
+                            [Op.gte]: thirtyDaysAgo
                         }
                     }
                 }),
                 Store.count({
                     where: {
                         created_at: {
-                            [Op.gte]: sevenDaysAgo
+                            [Op.gte]: thirtyDaysAgo
                         }
                     }
                 }),
                 Rating.count({
                     where: {
                         created_at: {
-                            [Op.gte]: sevenDaysAgo
+                            [Op.gte]: thirtyDaysAgo
                         }
                     }
                 })
             ]);
 
-            // Get rating distribution
-            const ratingDistribution = await Rating.findAll({
+            // Calculate average rating
+            const avgRating = await Rating.findOne({
                 attributes: [
-                    'rating',
-                    [sequelize.fn('COUNT', sequelize.col('rating')), 'count']
-                ],
-                group: ['rating'],
-                order: [['rating', 'ASC']]
-            });
-
-            // Get top rated stores using RAW SQL (FIXED VERSION)
-            const topRatedStores = await sequelize.query(`
-        SELECT s.id, s.name, s.address, 
-               COALESCE(AVG(r.rating::numeric), 0)::numeric(3,2) AS "averageRating", 
-               COUNT(r.id) AS "totalRatings"
-        FROM stores s
-        INNER JOIN ratings r ON s.id = r.store_id
-        GROUP BY s.id, s.name, s.address
-        ORDER BY "averageRating" DESC
-        LIMIT 5
-      `, {
-                type: sequelize.QueryTypes.SELECT
-            });
-
-            // Get average rating across all stores
-            const overallRatingStats = await Rating.findOne({
-                attributes: [
-                    [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
-                    [sequelize.fn('MIN', sequelize.col('rating')), 'minRating'],
-                    [sequelize.fn('MAX', sequelize.col('rating')), 'maxRating']
+                    [sequelize.fn('AVG', sequelize.col('rating')), 'average']
                 ]
             });
 
             return {
-                overview: {
-                    totalUsers,
-                    totalStores,
-                    totalRatings,
-                    averageRating: parseFloat(overallRatingStats?.dataValues?.averageRating || 0).toFixed(2)
-                },
-                userStats: {
-                    byRole: userRoleStats.map(role => ({
-                        role: role.role,
-                        count: parseInt(role.dataValues.count)
-                    })),
-                    recentSignups: recentUsers
-                },
-                storeStats: {
-                    total: totalStores,
-                    recentlyAdded: recentStores,
-                    topRated: topRatedStores.map(store => ({
-                        id: store.id,
-                        name: store.name,
-                        address: store.address,
-                        averageRating: parseFloat(store.averageRating),
-                        totalRatings: parseInt(store.totalRatings)
-                    }))
-                },
-                ratingStats: {
-                    total: totalRatings,
-                    recentlySubmitted: recentRatings,
-                    distribution: ratingDistribution.map(rating => ({
-                        rating: rating.rating,
-                        count: parseInt(rating.dataValues.count)
-                    })),
-                    overall: {
-                        average: parseFloat(overallRatingStats?.dataValues?.averageRating || 0).toFixed(2),
-                        min: parseInt(overallRatingStats?.dataValues?.minRating || 0),
-                        max: parseInt(overallRatingStats?.dataValues?.maxRating || 0)
-                    }
+                totalUsers,
+                totalStores,
+                totalRatings,
+                averageRating: parseFloat(avgRating?.dataValues?.average || 0).toFixed(1),
+                roleDistribution: roleStats.map(stat => ({
+                    role: stat.role,
+                    count: parseInt(stat.dataValues.count)
+                })),
+                recentActivity: {
+                    users: recentUsers,
+                    stores: recentStores,
+                    ratings: recentRatings
                 }
             };
         } catch (error) {
-            throw new Error(`Error fetching dashboard stats: ${error.message}`);
+            console.error('AdminService getDashboardStats error:', error);
+            throw error;
         }
     }
 
